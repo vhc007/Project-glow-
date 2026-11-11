@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Glow | Detail & Auto Restoration</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        glowGold: '#D4AF37',
+                        glowGoldHover: '#F3E5AB',
+                        deepGraphite: '#0B0C10',
+                        cardBg: '#16181E',
+                        accentDark: '#1F232D'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0C10;
+            color: #E2E8F0;
+        }
+
+        /* Metallic Glow Text Effect */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF5C0 0%, #D4AF37 50%, #AA7C11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-glow-shadow {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+        }
+
+        .gold-border-glow:hover {
+            border-color: #D4AF37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Custom Before/After Slider Container */
+        .ba-slider-container {
+            position: relative;
+            user-select: none;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .ba-before-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 50%;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .ba-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background-color: #D4AF37;
+            box-shadow: 0 0 12px #D4AF37;
+            z-index: 20;
+            transform: translateX(-50%);
+            cursor: ew-resize;
+        }
+
+        .ba-handle-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #16181E;
+            border: 2px solid #D4AF37;
+            color: #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-glowGold selection:text-black">
+
+    <!-- Header / Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-deepGraphite/80 backdrop-blur-md border-b border-gray-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-glowGold to-yellow-700 flex items-center justify-center gold-glow-shadow group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-sparkles text-black font-bold text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black tracking-wider text-white">PROJECT <span class="gold-gradient-text">GLOW</span></span>
+                        <span class="block text-[9px] tracking-widest text-gray-400 uppercase font-semibold">Auto Detail & Restoration</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="#services" class="hover:text-glowGold transition-colors">Servicios</a>
+                    <a href="#transformation" class="hover:text-glowGold transition-colors">Antes / Después</a>
+                    <a href="#calculator" class="hover:text-glowGold transition-colors">Cotizador Online</a>
+                    <a href="#reviews" class="hover:text-glowGold transition-colors">Opiniones</a>
+                </nav>
+
+                <!-- CTA Direct WhatsApp Button -->
+                <div class="hidden sm:flex items-center">
+                    <a href="https://wa.me/?text=Hola%20Project%20Glow,%20quisiera%20pedir%20informaci%C3%B3n%20para%20un%20servicio%20de%20detallado." target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-glowGold to-yellow-600 text-black font-bold text-sm hover:brightness-110 gold-glow-shadow transition-all duration-300 flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>Reservar Cita</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" aria-label="Abrir menú" class="text-gray-300 hover:text-white focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-cardBg border-b border-gray-800 px-4 pt-2 pb-6 space-y-3">
+            <a href="#services" class="block py-2 text-base font-medium hover:text-glowGold">Servicios</a>
+            <a href="#transformation" class="block py-2 text-base font-medium hover:text-glowGold">Antes / Después</a>
+            <a href="#calculator" class="block py-2 text-base font-medium hover:text-glowGold">Cotizador Online</a>
+            <a href="#reviews" class="block py-2 text-base font-medium hover:text-glowGold">Opiniones</a>
+            <a href="https://wa.me/?text=Hola%20Project%20Glow,%20quisiera%20pedir%20informaci%C3%B3n%20para%20un%20servicio%20de%20detallado." target="_blank" class="block w-full text-center mt-4 px-5 py-3 rounded-xl bg-glowGold text-black font-bold">
+                <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Reservar por WhatsApp
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 pb-20 md:pt-44 md:pb-32 overflow-hidden bg-gradient-to-b from-deepGraphite via-accentDark/30 to-deepGraphite">
+        <!-- Radial Glow Background -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-glowGold/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Hero Text Block -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accentDark border border-glowGold/30 text-glowGold text-xs font-semibold uppercase tracking-widest">
+                        <i class="fa-solid fa-gem"></i> Estética Automotriz de Alto Nivel
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
+                        La perfección reflejada en tu vehículo. <br/>
+                        <span class="gold-gradient-text">Restaura su brillo original.</span>
+                    </h1>
+
+                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 font-normal">
+                        Especialistas en corrección de pintura, protección cerámica de alta durabilidad y limpieza profunda interior. Devolvemos la presencia de exhibición a tu vehículo.
+                    </p>
+
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                        <a href="#calculator" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-glowGold to-yellow-600 text-black font-extrabold text-base hover:scale-105 transition-transform duration-300 gold-glow-shadow text-center">
+                            Calcula tu Presupuesto <i class="fa-solid fa-calculator ml-2"></i>
+                        </a>
+                        <a href="#transformation" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-cardBg border border-gray-700 text-white font-semibold text-base hover:border-glowGold transition-all duration-300 text-center">
+                            Ver Resultados <i class="fa-solid fa-chevron-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Key Badges -->
+                    <div class="pt-8 grid grid-cols-3 gap-4 border-t border-gray-800/80 text-center lg:text-left">
+                        <div>
+                            <span class="block text-2xl font-extrabold text-white">100%</span>
+                            <span class="text-xs text-gray-400">Garantía de Brillo</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl font-extrabold text-white">9H / 10H</span>
+                            <span class="text-xs text-gray-400">Protección Cerámica</span>
+                        </div>
+                        <div>
+                            <span class="block text-2xl font-extrabold text-white">+500</span>
+                            <span class="text-xs text-gray-400">Autos Restaurados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Vehicle Feature Card -->
+                <div class="lg:col-span-5">
+                    <div class="relative rounded-3xl overflow-hidden border border-gray-800 bg-cardBg p-3 gold-border-glow transition-all duration-500">
+                        <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1000&q=80" 
+                             alt="Supercar con acabado cerámico perfecto" 
+                             class="w-full h-80 sm:h-96 object-cover rounded-2xl"
+                             onerror="this.onerror=null; this.src='https://placehold.co/800x600/16181E/D4AF37?text=Project+Glow+Restoration';" />
+                        
+                        <div class="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-black/70 backdrop-blur-md border border-gray-700/60 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-glowGold font-semibold uppercase tracking-wider">Tratamiento Estrella</p>
+                                <p class="text-sm font-bold text-white">Coating Cerámico 9H Profundo</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-glowGold/20 border border-glowGold/50 text-glowGold text-xs font-bold">
+                                Espejo Real
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES MENU GRID -->
+    <section id="services" class="py-20 bg-deepGraphite relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs text-glowGold font-bold uppercase tracking-widest mb-2">Nuestros Servicios Premium</h2>
+                <p class="text-3xl sm:text-5xl font-black text-white tracking-tight">Soluciones integrales para tu vehículo</p>
+                <p class="text-gray-400 mt-4 text-base">Utilizamos tecnología de vanguardia, pulidoras de doble acción y selladores cerámicos de grado industrial.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Service 1 -->
+                <div class="bg-cardBg border border-gray-800 rounded-2xl p-6 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between gold-border-glow group">
+                    <div>
+                        <div class="w-14 h-14 rounded-xl bg-glowGold/10 border border-glowGold/30 flex items-center justify-center text-glowGold text-2xl mb-6 group-hover:bg-glowGold group-hover:text-black transition-colors duration-300">
+                            <i class="fa-solid fa-car-wash"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Detallado Exterior</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                            Lavado técnico de dos cubos, descontaminación con clay bar, desengrasado de llantas y micro-pulido de mantenimiento.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 border-t border-gray-800 pt-4">
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Descontaminación férrea</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Acondicionado de neumáticos</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Sellador sintético 3 meses</li>
+                    </ul>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="bg-cardBg border border-gray-800 rounded-2xl p-6 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between gold-border-glow group">
+                    <div>
+                        <div class="w-14 h-14 rounded-xl bg-glowGold/10 border border-glowGold/30 flex items-center justify-center text-glowGold text-2xl mb-6 group-hover:bg-glowGold group-hover:text-black transition-colors duration-300">
+                            <i class="fa-solid fa-spray-can"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Corrección de Pintura</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                            Eliminación de microrrayones (swirls), marcas de agua, holografía y oxidación. Restauramos el brillo reflejo espejado.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 border-t border-gray-800 pt-4">
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Eliminación hasta 90% micro-rayas</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Restauración de profundidad</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Medición con micrómetro</li>
+                    </ul>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="bg-cardBg border border-gray-800 rounded-2xl p-6 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between gold-border-glow group">
+                    <div>
+                        <div class="w-14 h-14 rounded-xl bg-glowGold/10 border border-glowGold/30 flex items-center justify-center text-glowGold text-2xl mb-6 group-hover:bg-glowGold group-hover:text-black transition-colors duration-300">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Recubrimiento Cerámico</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                            Escudo nanotecnológico 9H/10H resistente a excrementos de aves, rayos UV, lluvia ácida y efectos hidrofóbicos extremos.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 border-t border-gray-800 pt-4">
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Protección de 1 a 5 años</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Efecto hidrofóbico autopulido</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Garantía por certificado</li>
+                    </ul>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="bg-cardBg border border-gray-800 rounded-2xl p-6 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between gold-border-glow group">
+                    <div>
+                        <div class="w-14 h-14 rounded-xl bg-glowGold/10 border border-glowGold/30 flex items-center justify-center text-glowGold text-2xl mb-6 group-hover:bg-glowGold group-hover:text-black transition-colors duration-300">
+                            <i class="fa-solid fa-couch"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Limpieza Interior Profunda</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                            Desinfección a vapor, inyección-extracción de tapicería, nutrición de cueros y eliminación completa de olores con ozono.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 border-t border-gray-800 pt-4">
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Limpieza a vapor 140°C</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Hidratación de piel / cuero</li>
+                        <li><i class="fa-solid fa-check text-glowGold mr-2"></i>Tratamiento anti-bacterias</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- BEFORE / AFTER INTERACTIVE SLIDER SECTION -->
+    <section id="transformation" class="py-20 bg-accentDark/40 border-y border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-xs text-glowGold font-bold uppercase tracking-widest mb-2">Resultados Reales</h2>
+                <p class="text-3xl sm:text-4xl font-black text-white">Desliza para ver la Transformación</p>
+                <p class="text-gray-400 text-sm mt-2">Pasa el cursor o arrastra con el dedo sobre la imagen para comparar el estado previo de la pintura oxidada con microrrayones vs. nuestra restauración espejo.</p>
+            </div>
+
+            <!-- Comparison Canvas Box -->
+            <div class="max-w-4xl mx-auto">
+                <div id="ba-slider" class="ba-slider-container w-full h-[320px] sm:h-[480px] rounded-3xl border border-gray-700 shadow-2xl relative">
+                    
+                    <!-- AFTER Image (Background Base) -->
+                    <img src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80" 
+                         alt="Después: Pintura restaurada con brillo cerámico" 
+                         class="absolute inset-0 w-full h-full object-cover"
+                         onerror="this.onerror=null; this.src='https://placehold.co/1200x800/16181E/D4AF37?text=DESPUES+-+Acabado+Espejo+Perfecto';" />
+                    
+                    <div class="absolute bottom-4 right-4 z-10 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-glowGold text-xs font-bold border border-glowGold/40 uppercase">
+                        Después (Project Glow)
+                    </div>
+
+                    <!-- BEFORE Image (Foreground Clipped) -->
+                    <div id="ba-before" class="ba-before-img">
+                        <!-- Image with filter/overlay simulating scratch & dullness -->
+                        <img src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80" 
+                             alt="Antes: Pintura desgastada y opaca" 
+                             class="absolute inset-0 w-full h-full object-cover filter brightness-75 contrast-125 sepia-[.3]" 
+                             style="max-width: none;"
+                             onerror="this.onerror=null; this.src='https://placehold.co/1200x800/333333/FFFFFF?text=ANTES+-+Pintura+Opaca+y+Con+Rayones';" />
+                        <div class="absolute bottom-4 left-4 z-10 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-gray-300 text-xs font-bold border border-gray-600 uppercase">
+                            Antes (Estado Inicial)
+                        </div>
+                    </div>
+
+                    <!-- Divider Line Handle -->
+                    <div id="ba-handle" class="ba-handle">
+                        <div class="ba-handle-btn">
+                            <i class="fa-solid fa-left-right text-sm"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE PRICE & QUOTE ESTIMATOR CALCULATOR -->
+    <section id="calculator" class="py-20 bg-deepGraphite relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-cardBg border border-gray-800 rounded-3xl p-6 sm:p-10 gold-glow-shadow">
+                
+                <div class="text-center mb-8">
+                    <span class="px-3 py-1 rounded-full bg-glowGold/10 text-glowGold text-xs font-bold border border-glowGold/30 uppercase">Cotizador Instantáneo</span>
+                    <h2 class="text-3xl font-black text-white mt-3">Calcula el Costo de tu Servicio</h2>
+                    <p class="text-gray-400 text-sm mt-1">Selecciona los parámetros de tu vehículo para obtener un estimado personalizado.</p>
+                </div>
+
+                <form id="quote-form" class="space-y-6" onsubmit="event.preventDefault();">
+                    
+                    <!-- Vehicle Type Selector -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-200 mb-3">1. Tipo de Vehículo</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="vehicle_type" value="sedan" data-price="1.0" class="peer hidden" checked>
+                                <div class="p-4 rounded-xl border border-gray-700 bg-accentDark/40 text-center peer-checked:border-glowGold peer-checked:bg-glowGold/10 peer-checked:text-glowGold transition-all">
+                                    <i class="fa-solid fa-car text-2xl mb-2 block"></i>
+                                    <span class="text-xs font-bold">Sedán / Hatchback</span>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer">
+                                <input type="radio" name="vehicle_type" value="suv" data-price="1.25" class="peer hidden">
+                                <div class="p-4 rounded-xl border border-gray-700 bg-accentDark/40 text-center peer-checked:border-glowGold peer-checked:bg-glowGold/10 peer-checked:text-glowGold transition-all">
+                                    <i class="fa-solid fa-car-side text-2xl mb-2 block"></i>
+                                    <span class="text-xs font-bold">SUV / Crossover</span>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer">
+                                <input type="radio" name="vehicle_type" value="pickup" data-price="1.4" class="peer hidden">
+                                <div class="p-4 rounded-xl border border-gray-700 bg-accentDark/40 text-center peer-checked:border-glowGold peer-checked:bg-glowGold/10 peer-checked:text-glowGold transition-all">
+                                    <i class="fa-solid fa-truck-pickup text-2xl mb-2 block"></i>
+                                    <span class="text-xs font-bold">Camioneta / Pick-Up</span>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer">
+                                <input type="radio" name="vehicle_type" value="luxury" data-price="1.6" class="peer hidden">
+                                <div class="p-4 rounded-xl border border-gray-700 bg-accentDark/40 text-center peer-checked:border-glowGold peer-checked:bg-glowGold/10 peer-checked:text-glowGold transition-all">
+                                    <i class="fa-solid fa-car-rear text-2xl mb-2 block"></i>
+                                    <span class="text-xs font-bold">Deportivo / Gran Tamaño</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Services Checkboxes -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-200 mb-3">2. Selecciona Tratamientos Necesarios</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center p-3.5 rounded-xl border border-gray-700 bg-accentDark/30 cursor-pointer hover:border-gray-500 transition-colors">
+                                <input type="checkbox" class="service-checkbox w-4 h-4 rounded text-glowGold focus:ring-glowGold bg-gray-800 border-gray-600" value="Detallado Exterior Básico" data-base="60" checked>
+                                <span class="ml-3 text-sm text-gray-200 font-medium flex-1">Detallado Exterior & Descontaminación</span>
+                                <span class="text-xs text-glowGold font-bold">+$60</span>
+                            </label>
+
+                            <label class="flex items-center p-3.5 rounded-xl border border-gray-700 bg-accentDark/30 cursor-pointer hover:border-gray-500 transition-colors">
+                                <input type="checkbox" class="service-checkbox w-4 h-4 rounded text-glowGold focus:ring-glowGold bg-gray-800 border-gray-600" value="Corrección de Pintura (Etapa 1-2)" data-base="120">
+                                <span class="ml-3 text-sm text-gray-200 font-medium flex-1">Corrección de Pintura (Eliminación Rayas)</span>
+                                <span class="text-xs text-glowGold font-bold">+$120</span>
+                            </label>
+
+                            <label class="flex items-center p-3.5 rounded-xl border border-gray-700 bg-accentDark/30 cursor-pointer hover:border-gray-500 transition-colors">
+                                <input type="checkbox" class="service-checkbox w-4 h-4 rounded text-glowGold focus:ring-glowGold bg-gray-800 border-gray-600" value="Protección Cerámica 9H (3 Años)" data-base="180">
+                                <span class="ml-3 text-sm text-gray-200 font-medium flex-1">Cerámico Nanotecnológico 9H</span>
+                                <span class="text-xs text-glowGold font-bold">+$180</span>
+                            </label>
+
+                            <label class="flex items-center p-3.5 rounded-xl border border-gray-700 bg-accentDark/30 cursor-pointer hover:border-gray-500 transition-colors">
+                                <input type="checkbox" class="service-checkbox w-4 h-4 rounded text-glowGold focus:ring-glowGold bg-gray-800 border-gray-600" value="Limpieza Profunda de Interiores" data-base="80">
+                                <span class="ml-3 text-sm text-gray-200 font-medium flex-1">Limpieza e Higienización de Interior</span>
+                                <span class="text-xs text-glowGold font-bold">+$80</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Additional Extras -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-200 mb-3">3. Adicionales opcionales</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center p-3 rounded-xl border border-gray-800 bg-deepGraphite/50 cursor-pointer">
+                                <input type="checkbox" class="extra-checkbox w-4 h-4 rounded text-glowGold focus:ring-glowGold bg-gray-800 border-gray-600" value="Restauración de Faros" data-base="30">
+                                <span class="ml-3 text-xs text-gray-300 flex-1">Restauración y Polimerizado de Faros</span>
+                                <span class="text-xs text-gray-400 font-semibold">+$30</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl border border-gray-800 bg-deepGraphite/50 cursor-pointer">
+                                <input type="checkbox" class="extra-checkbox w-4 h-4 rounded text-glowGold focus:ring-glowGold bg-gray-800 border-gray-600" value="Detallado de Motor" data-base="40">
+                                <span class="ml-3 text-xs text-gray-300 flex-1">Limpieza y Protección de Motor</span>
+                                <span class="text-xs text-gray-400 font-semibold">+$40</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price Output Box & WhatsApp CTA -->
+                    <div class="pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div>
+                            <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider block">Estimado Total Aproximado</span>
+                            <div class="text-4xl font-black gold-gradient-text" id="total-price-display">$60.00</div>
+                            <span class="text-[10px] text-gray-500">*Precio sujeto a inspección previa del estado de la pintura.</span>
+                        </div>
+
+                        <button type="button" id="whatsapp-quote-btn" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-base transition-all duration-300 shadow-lg shadow-green-900/30 flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                            <span>Enviar Cotización a WhatsApp</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS / REVIEWS SECTION -->
+    <section id="reviews" class="py-20 bg-accentDark/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-xs text-glowGold font-bold uppercase tracking-widest mb-2">Opiniones de Nuestros Clientes</h2>
+                <p class="text-3xl sm:text-4xl font-black text-white">Experiencias que avalan nuestro trabajo</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Review 1 -->
+                <div class="bg-cardBg border border-gray-800 p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-glowGold text-xs gap-1 mb-4">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-6 italic">
+                            "Llevé mi coche negro lleno de swirls por lavados mal hechos. El tratamiento cerámico de Project Glow le devolvió el acabado espejo. Parecía recién salido del concesionario."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-gray-800/80 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-glowGold/20 text-glowGold font-bold flex items-center justify-center text-sm border border-glowGold/40">
+                            CM
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-white">Carlos Mendoza</p>
+                            <p class="text-xs text-gray-500">BMW M3 CS</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="bg-cardBg border border-gray-800 p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-glowGold text-xs gap-1 mb-4">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-6 italic">
+                            "El nivel de detalle en la limpieza del interior superó mis expectativas. Limpiaron hasta el último rincón de los asientos de cuero. Atención impecable."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-gray-800/80 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-glowGold/20 text-glowGold font-bold flex items-center justify-center text-sm border border-glowGold/40">
+                            VR
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-white">Valeria Rivas</p>
+                            <p class="text-xs text-gray-500">Porsche Macan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="bg-cardBg border border-gray-800 p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-glowGold text-xs gap-1 mb-4">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-6 italic">
+                            "Servicio ultra profesional. Te explican detalladamente el proceso de corrección de pintura con medidor de espesores. El repelente de agua funciona perfecto."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 border-t border-gray-800/80 pt-4">
+                        <div class="w-10 h-10 rounded-full bg-glowGold/20 text-glowGold font-bold flex items-center justify-center text-sm border border-glowGold/40">
+                            AR
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-white">Alejandro Ramírez</p>
+                            <p class="text-xs text-gray-500">Toyota Hilux TRD</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-deepGraphite border-t border-gray-800/80 pt-16 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <!-- Brand Info -->
+                <div class="md:col-span-2 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-glowGold flex items-center justify-center text-black font-bold">
+                            <i class="fa-solid fa-sparkles"></i>
+                        </div>
+                        <span class="text-xl font-black text-white">PROJECT <span class="gold-gradient-text">GLOW</span></span>
+                    </div>
+                    <p class="text-gray-400 text-sm max-w-sm">
+                        Centro especializado de estética automotriz, corrección de laca y nanotecnología cerámica.
+                    </p>
+                    <div class="flex space-x-4 pt-2">
+                        <a href="#" class="w-9 h-9 rounded-full bg-cardBg border border-gray-700 text-gray-400 hover:text-glowGold hover:border-glowGold flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-cardBg border border-gray-700 text-gray-400 hover:text-glowGold hover:border-glowGold flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-cardBg border border-gray-700 text-gray-400 hover:text-glowGold hover:border-glowGold flex items-center justify-center transition-colors">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hours -->
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Horarios de Atención</h4>
+                    <ul class="text-xs text-gray-400 space-y-2">
+                        <li>Lunes a Viernes: 8:00 AM - 6:00 PM</li>
+                        <li>Sábados: 9:00 AM - 3:00 PM</li>
+                        <li>Domingos: Previa Reserva</li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Ubicación y Contacto</h4>
+                    <ul class="text-xs text-gray-400 space-y-2">
+                        <li><i class="fa-solid fa-location-dot text-glowGold mr-2"></i> Zona Industrial / Taller Principal</li>
+                        <li><i class="fa-solid fa-phone text-glowGold mr-2"></i> +58 (412) 000-0000</li>
+                        <li><i class="fa-solid fa-envelope text-glowGold mr-2"></i> info@projectglowdetail.com</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-900 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500">
+                <p>&copy; <span id="year-span"></span> Project Glow Detailing. Todos los derechos reservados.</p>
+                <div class="flex space-x-6 mt-4 sm:mt-0">
+                    <a href="#" class="hover:text-gray-400">Términos de Servicio</a>
+                    <a href="#" class="hover:text-gray-400">Política de Privacidad</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT FOR INTERACTIVITY -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Update Dynamic Year
+            document.getElementById('year-span').textContent = new Date().getFullYear();
+
+            // Mobile Menu Toggle
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileBtn && mobileMenu) {
+                mobileBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // BEFORE / AFTER SLIDER LOGIC
+            const slider = document.getElementById('ba-slider');
+            const beforeImg = document.getElementById('ba-before');
+            const handle = document.getElementById('ba-handle');
+
+            if (slider && beforeImg && handle) {
+                let isDragging = false;
+
+                const updateSliderPosition = (clientX) => {
+                    const rect = slider.getBoundingClientRect();
+                    let x = clientX - rect.left;
+                    if (x < 0) x = 0;
+                    if (x > rect.width) x = rect.width;
+
+                    const percentage = (x / rect.width) * 100;
+                    beforeImg.style.width = `${percentage}%`;
+                    handle.style.left = `${percentage}%`;
+                };
+
+                const onMove = (e) => {
+                    if (!isDragging) return;
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    updateSliderPosition(clientX);
+                };
+
+                slider.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    updateSliderPosition(e.clientX);
+                });
+
+                slider.addEventListener('touchstart', (e) => {
+                    isDragging = true;
+                    updateSliderPosition(e.touches[0].clientX);
+                }, { passive: true });
+
+                window.addEventListener('mouseup', () => { isDragging = false; });
+                window.addEventListener('touchend', () => { isDragging = false; });
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('touchmove', onMove, { passive: true });
+            }
+
+            // INTERACTIVE PRICE ESTIMATOR CALCULATOR LOGIC
+            const vehicleRadios = document.querySelectorAll('input[name="vehicle_type"]');
+            const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+            const extraCheckboxes = document.querySelectorAll('.extra-checkbox');
+            const totalPriceDisplay = document.getElementById('total-price-display');
+            const whatsappBtn = document.getElementById('whatsapp-quote-btn');
+
+            function calculateTotal() {
+                // 1. Get Selected Vehicle Multiplier
+                let vehicleMultiplier = 1.0;
+                vehicleRadios.forEach(radio => {
+                    if (radio.checked) {
+                        vehicleMultiplier = parseFloat(radio.getAttribute('data-price')) || 1.0;
+                    }
+                });
+
+                // 2. Sum Services Base Cost
+                let servicesTotal = 0;
+                serviceCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        servicesTotal += parseFloat(cb.getAttribute('data-base')) || 0;
+                    }
+                });
+
+                // 3. Sum Extras Base Cost
+                let extrasTotal = 0;
+                extraCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        extrasTotal += parseFloat(cb.getAttribute('data-base')) || 0;
+                    }
+                });
+
+                // Calculate final price: (Services Base * Vehicle Multiplier) + Extras
+                const grandTotal = (servicesTotal * vehicleMultiplier) + extrasTotal;
+
+                // Update UI Display
+                if (totalPriceDisplay) {
+                    totalPriceDisplay.textContent = `$${grandTotal.toFixed(2)}`;
+                }
+
+                return grandTotal;
+            }
+
+            // Add Event Listeners for Live Updates
+            vehicleRadios.forEach(r => r.addEventListener('change', calculateTotal));
+            serviceCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
+            extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
+
+            // Initial calculation
+            calculateTotal();
+
+            // WhatsApp Direct Booking Integration
+            if (whatsappBtn) {
+                whatsappBtn.addEventListener('click', () => {
+                    // Selected Vehicle Text
+                    let selectedVehicle = 'Sedán / Hatchback';
+                    vehicleRadios.forEach(radio => {
+                        if (radio.checked) {
+                            const label = radio.parentElement.querySelector('span');
+                            if (label) selectedVehicle = label.textContent.trim();
+                        }
+                    });
+
+                    // Selected Services List
+                    const selectedServices = [];
+                    serviceCheckboxes.forEach(cb => {
+                        if (cb.checked) selectedServices.push(cb.value);
+                    });
+                    extraCheckboxes.forEach(cb => {
+                        if (cb.checked) selectedServices.push(cb.value);
+                    });
+
+                    const totalEstimated = calculateTotal().toFixed(2);
+
+                    const servicesText = selectedServices.length > 0 ? selectedServices.join(', ') : 'Consulta General';
+
+                    const message = `Hola *Project Glow*, me gustaría solicitar una cita de detallado.\n\n` +
+                                    `🚘 *Vehículo:* ${selectedVehicle}\n` +
+                                    `🛠 *Servicios deseados:* ${servicesText}\n` +
+                                    `💰 *Estimado calculado:* $${totalEstimated}\n\n` +
+                                    `¿Tienen disponibilidad para agendar esta semana?`;
+
+                    const encodedMessage = encodeURIComponent(message);
+                    // Replace with actual phone number if desired
+                    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
