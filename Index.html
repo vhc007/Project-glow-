@@ -41,7 +41,108 @@
         }
 
         /* Metallic text & Red logo theme */
-        .text-glow-red {
+        <div class="logo-container">
+    <div class="logo-graphic">
+        <!-- Gráfico vectorial del coche (Silueta frontal estilo GT-R) -->
+        <svg class="car-silhouette" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M40 75 L55 55 L90 45 L170 43 L210 50 L240 65 L255 72 L245 74 L210 70 L100 70 L65 72 Z" fill="#d1d5db"/>
+            <path d="M35 75 Q45 68 60 70 L75 85 L200 85 L215 72 Q240 70 255 72 L260 78 Q220 83 140 83 Q60 83 35 78 Z" fill="#ffffff"/>
+            <path d="M65 52 L92 47 L165 45 L195 50 L185 68 L75 68 Z" fill="#1f2937" opacity="0.8"/>
+            <rect x="75" y="70" width="35" height="15" rx="2" fill="#0b0f19" stroke="#9ca3af" stroke-width="1.5"/>
+        </svg>
+
+        <!-- Texto del Logotipo -->
+        <div class="logo-text-group">
+            <div class="main-title">
+                <span class="project-word">PROJECT</span>
+                <span class="glow-word">GLOW</span>
+            </div>
+            <div class="sub-title-row">
+                <div class="red-line"></div>
+                <span class="tagline">pasión por la perfección</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.logo-container {
+    background-color: #0b0f19;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.logo-graphic {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+}
+
+.car-silhouette {
+    width: 260px;
+    height: auto;
+    margin-bottom: -15px;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.logo-text-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-title {
+    display: flex;
+    font-weight: 900;
+    font-size: 2.4rem;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.project-word {
+    color: #e5e7eb;
+    font-style: italic;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.glow-word {
+    background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-style: italic;
+    margin-left: 6px;
+    filter: drop-shadow(0 2px 3px rgba(239, 68, 68, 0.4));
+}
+
+.sub-title-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.red-line {
+    height: 4px;
+    background-color: #dc2626;
+    width: 65%;
+    border-radius: 2px;
+}
+
+.tagline {
+    color: #ef4444;
+    font-size: 0.85rem;
+    font-style: italic;
+    font-weight: 600;
+    margin-left: 10px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+</style>
+text-glow-red {
             color: #E50914;
         }
         
